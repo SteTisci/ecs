@@ -1,4 +1,4 @@
-import type { QueryResult, StoreDataMap, StoreInit } from './index.js';
+import type { QueryResult, StoreDataMap } from './index.js';
 
 /**
  * Interface for the main ECS registry.
@@ -13,7 +13,7 @@ export interface IECS<T> {
    * Must be called before any other operations.
    * @param components - Object mapping component names to their structure
    */
-  defineComponents: (data: StoreInit<T>) => void;
+  defineComponents: (data: Partial<Record<keyof T, any>>) => void;
 
   /**
    * Creates a new entity in the ECS.

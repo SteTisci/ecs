@@ -40,9 +40,3 @@ export type StoreDataMap<T> = {
 export type QueryResult<T, C extends (keyof T)[]> = {
   [K in C[number]]: { id: number };
 };
-
-export type StoreInit<T> = {
-  [K in keyof T]: {
-    [P in keyof T[K]]: T[K][P][];
-  };
-};

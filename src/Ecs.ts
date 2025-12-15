@@ -1,4 +1,4 @@
-import type { QueryResult, StoreDataMap, StoreInit, StoreMap } from './types/index.js';
+import type { QueryResult, StoreDataMap, StoreMap } from './types/index.js';
 import { ComponentStore } from './ComponentStore.js';
 import { EntityManager } from './EntityManager.js';
 import { createComponentRegistry } from './utils/ComponentRegistry.js';
@@ -11,7 +11,7 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
   const components = {} as StoreDataMap<T>;
 
   // Initialize the structure of the components used
-  function defineComponents(data: StoreInit<T>): void {
+  function defineComponents(data: Partial<Record<keyof T, any>>): void {
     for (const key in data) {
       ComponentRegistry.register(key);
       internalStores[key] = ComponentStore<T[typeof key]>();
