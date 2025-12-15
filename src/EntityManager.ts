@@ -1,5 +1,5 @@
 import type { IComponentRegistry } from './types/IComponentRegistry.js';
-import { IEntityManager } from './types/IEntityManager.js';
+import type { IEntityManager } from './types/IEntityManager.js';
 
 export function EntityManager<K extends string>(registry: IComponentRegistry<K>): IEntityManager<K> {
   let nextID: number = 0;

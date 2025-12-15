@@ -1,8 +1,8 @@
 import type { QueryResult, StoreDataMap, StoreMap } from './types/index.js';
+import type { IECS } from './types/IEcs.js';
 import { ComponentStore } from './ComponentStore.js';
 import { EntityManager } from './EntityManager.js';
 import { createComponentRegistry } from './utils/ComponentRegistry.js';
-import { IECS } from './types/IEcs.js';
 
 export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
   const ComponentRegistry = createComponentRegistry<keyof T & string>();
