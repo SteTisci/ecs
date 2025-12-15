@@ -1,4 +1,4 @@
-import { ISparseSet } from '../types/ISparseSet.js';
+import type { ISparseSet } from '../types/ISparseSet.js';
 
 export function SparseSet(): ISparseSet {
   const sparse: number[] = [];

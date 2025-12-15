@@ -1,4 +1,4 @@
-import { IComponentRegistry } from '../types/IComponentRegistry.js';
+import type { IComponentRegistry } from '../types/IComponentRegistry.js';
 
 export function createComponentRegistry<K extends string>(): IComponentRegistry<K> {
   const nameToID = new Map<K, number>();
