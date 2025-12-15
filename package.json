@@ -1,14 +1,20 @@
 {
-  "name": "ecs",
-  "version": "1.1.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@ste_tisci/ecs",
+  "version": "0.1.0",
+  "description": "A minimalistic game engine with zero dependencies based on the Entity Component System (ECS) architecture implemented in TypeScript",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SteTisci/ecs"
+  },
   "type": "module",
   "devDependencies": {
     "tsup": "^8.5.1",
