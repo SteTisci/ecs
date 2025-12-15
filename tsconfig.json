@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2024",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "moduleResolution": "nodenext",
+    "module": "node20"
+  },
+  "exclude": ["node_modules/"],
+  "include": ["src"]
+}
