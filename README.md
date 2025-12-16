@@ -46,12 +46,7 @@ const World = ECS<{
 // Position = { x: number[], y: number[] }
 // Size = { src: HTMLImageElement[] }
 // etc.
-World.defineComponents({
-  Position: {},
-  Size: {},
-  Velocity: {},
-  Sprite: {},
-});
+World.defineComponents('Position', 'Velocity', 'Size', 'Sprite');
 
 const ent = World.createEntity();
 
