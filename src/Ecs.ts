@@ -11,11 +11,11 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
   const components = {} as StoreDataMap<T>;
 
   // Initialize the structure of the components used
-  function defineComponents(data: Partial<Record<keyof T, any>>): void {
-    for (const key in data) {
-      ComponentRegistry.register(key);
-      internalStores[key] = ComponentStore<T[typeof key]>();
-      components[key] = internalStores[key].getData();
+  function defineComponents<K extends readonly (keyof T)[]>(...names: K): void {
+    for (const name of names) {
+      ComponentRegistry.register(name as string);
+      internalStores[name] = ComponentStore<T[typeof name]>();
+      components[name] = internalStores[name].getData();
     }
   }
 

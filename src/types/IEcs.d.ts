@@ -11,9 +11,9 @@ export interface IECS<T> {
    * Initializes the ECS with component definitions.
    * Registers all components and creates their corresponding stores.
    * Must be called before any other operations.
-   * @param components - Object mapping component names to their structure
+   * @param names -component names
    */
-  defineComponents: (data: Partial<Record<keyof T, any>>) => void;
+  defineComponents<K extends readonly (keyof T)[]>(...names: K): void;
 
   /**
    * Creates a new entity in the ECS.
