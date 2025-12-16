@@ -1,6 +1,6 @@
 {
   "name": "@ste_tisci/ecs",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A minimalistic game engine with zero dependencies based on the Entity Component System (ECS) architecture implemented in TypeScript",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
