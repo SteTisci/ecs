@@ -62,4 +62,12 @@ export interface IEntityManager<K extends string> {
    * @throws Error if the entity doesn't exist
    */
   getMask: (eid: number) => bigint;
+
+  /**
+   * Non-throwing variant of getMask, for hot loops.
+   * Lets a caller test existence and component membership with a single call.
+   * @param eid - The entity ID
+   * @returns The entity's bitmask, or undefined if the entity does not exist
+   */
+  tryGetMask: (eid: number) => bigint | undefined;
 }

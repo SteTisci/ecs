@@ -50,5 +50,11 @@ export function SparseSet(): ISparseSet {
     return size;
   }
 
-  return { has, add, remove, getIndex, getDense, getSize };
+  // Exposes the raw lookup table so hot loops can index it directly instead of
+  // paying a closure call to getIndex() for every entity.
+  function getSparse(): number[] {
+    return sparse;
+  }
+
+  return { has, add, remove, getIndex, getDense, getSize, getSparse };
 }

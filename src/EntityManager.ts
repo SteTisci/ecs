@@ -56,5 +56,12 @@ export function EntityManager<K extends string>(registry: IComponentRegistry<K>)
     return bitMasks[eid];
   }
 
-  return { exists, hasComponent, create, remove, addComponent, removeComponent, getMask };
+  // Hot-loop variant of getMask: reports a missing entity through the return value
+  // instead of throwing, so a query needs one call per entity rather than an
+  // exists() check followed by a getMask() that re-runs the same check.
+  function tryGetMask(eid: number): bigint | undefined {
+    return eid >= 0 && eid < nextID ? bitMasks[eid] : undefined;
+  }
+
+  return { exists, hasComponent, create, remove, addComponent, removeComponent, getMask, tryGetMask };
 }

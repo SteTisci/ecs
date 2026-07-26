@@ -46,4 +46,12 @@ export interface ISparseSet {
    * @returns The current size of the Dense array
    */
   getSize: () => number;
+
+  /**
+   * Retrive the raw sparse lookup table, mapping an entity ID to its dense index.
+   * Intended for hot loops that would otherwise call getIndex() once per entity.
+   * Only the entries of entities currently in the set are meaningful.
+   * @returns The live sparse array
+   */
+  getSparse: () => number[];
 }

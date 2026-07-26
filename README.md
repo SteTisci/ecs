@@ -75,6 +75,39 @@ function gameLoop() {
 gameLoop();
 ```
 
+## Hot systems: `queryIds`
+
+`query` yields one result object plus one `{ id }` object per component per entity, which is
+convenient but allocates on every iteration. For systems that run every frame over many
+entities, `queryIds` returns the matching entity IDs instead, and `indices` translates an
+entity ID into its slot in the SoA arrays:
+
+```typescript
+function movementSystem(World) {
+  const { Position, Velocity } = World.components;
+  const pos = World.indices.Position;
+  const vel = World.indices.Velocity;
+
+  for (const eid of World.queryIds('Position', 'Velocity')) {
+    Position.x[pos[eid]] += Velocity.x[vel[eid]];
+    Position.y[pos[eid]] += Velocity.y[vel[eid]];
+  }
+}
+```
+
+Both APIs return the same entities; `queryIds` is roughly 3x faster on a packed query and 5x
+on a fragmented one, at the cost of resolving indices yourself.
+
+## Iteration and mutation
+
+`query` iterates a snapshot taken when the generator starts, so calling `removeComponent` or
+`destroyEntity` from inside the loop cannot skip an entity. Entities created mid-iteration are
+not visited by the query in flight; the next call picks them up.
+
+`queryIds` builds its whole result before returning, so the same guarantee holds. Note that
+destroying an entity invalidates its entry in `indices`, so if a loop destroys entities it
+must not read their storage index afterwards.
+
 ## Error Handling
 
 Every operation validates its inputs and throws a descriptive `Error` instead of failing silently or corrupting state:

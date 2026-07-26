@@ -50,4 +50,11 @@ export interface IComponentStore<T> {
    * @returns The count of entities with this component
    */
   getSize: () => number;
+
+  /**
+   * Returns the raw sparse table mapping an entity ID to its index in the data arrays.
+   * Intended for hot loops that would otherwise call getIndex() once per entity.
+   * @returns The live sparse array
+   */
+  getSparse: () => number[];
 }

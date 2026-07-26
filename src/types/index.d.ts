@@ -34,6 +34,16 @@ export type StoreDataMap<T> = {
 };
 
 /**
+ * Maps component names to their raw sparse lookup table.
+ * Each table translates an entity ID into that entity's index in the component's
+ * data arrays, which is what queryIds callers need to read the SoA storage.
+ * @template T - Record type defining all component types
+ */
+export type IndexMap<T> = {
+  [K in keyof T]: number[];
+};
+
+/**
  * Type helper for the query result.
  * Creates an object with an entry for each requested component, holding its store index.
  * @template C - Array of the component names requested in the query.

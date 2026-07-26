@@ -1,4 +1,4 @@
-import type { QueryResult, StoreDataMap } from './index.js';
+import type { IndexMap, QueryResult, StoreDataMap } from './index.js';
 
 /**
  * Interface for the main ECS registry.
@@ -60,5 +60,38 @@ export interface IECS<T> {
    */
   query: <C extends (keyof T)[]>(...componentName: C) => Generator<QueryResult<C>>;
 
+  /**
+   * Allocation-free counterpart to query, for hot systems.
+   * Returns the IDs of every entity holding all the specified components, instead of
+   * yielding one result object plus one { id } object per component per entity.
+   * Translate an entity ID into a storage index through `indices`:
+   *
+   * ```ts
+   * const { Position, Velocity } = World.components;
+   * const pos = World.indices.Position;
+   * const vel = World.indices.Velocity;
+   *
+   * for (const eid of World.queryIds('Position', 'Velocity')) {
+   *   Position.x[pos[eid]] += Velocity.x[vel[eid]];
+   * }
+   * ```
+   *
+   * The array is complete before it is returned, so adding or removing components while
+   * looping over it cannot skip an entity. Destroying an entity mid-loop does invalidate
+   * its storage index, so guard that case yourself.
+   *
+   * @template C - Array of component names to query for
+   * @param componentName - List of component names that the entity must include
+   * @returns A fresh array of matching entity IDs
+   */
+  queryIds: <C extends (keyof T)[]>(...componentName: C) => number[];
+
   components: StoreDataMap<T>;
+
+  /**
+   * Maps each component name to its sparse lookup table, translating an entity ID into
+   * that entity's index in the component's data arrays. Needed to read `components`
+   * when iterating the output of queryIds.
+   */
+  indices: IndexMap<T>;
 }

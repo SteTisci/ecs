@@ -7,7 +7,8 @@ const INITIAL_CAPACITY = 8;
 // Float32Array has a fixed length, so numeric fields grow by doubling capacity
 // (like a dynamic array reallocation) instead of relying on push/pop.
 function grow(buffer: Float32Array, requiredIndex: number): Float32Array {
-  let capacity = buffer.length;
+  // A zero-length buffer would make the doubling loop below spin forever
+  let capacity = buffer.length || INITIAL_CAPACITY;
   while (capacity <= requiredIndex) capacity *= 2;
 
   const grown = new Float32Array(capacity);
@@ -21,10 +22,13 @@ type FieldStore = Float32Array | unknown[];
 
 export function ComponentStore<T extends Record<string, any>>(): IComponentStore<T> {
   const componentSet = SparseSet();
-  const componentData: Record<string, FieldStore> = {};
+
+  // Null-prototype: field names are user-supplied, so a field called `toString` or
+  // `constructor` must not resolve to an inherited Object.prototype member.
+  const componentData: Record<string, FieldStore> = Object.create(null);
 
   // Tracks which fields are numeric (Float32Array-backed) vs plain arrays, keyed by field name
-  const isNumeric: Record<string, boolean> = {};
+  const isNumeric: Record<string, boolean> = Object.create(null);
 
   function add(eid: number, data: T): void {
     if (componentSet.has(eid)) throw new Error(`Entity ${eid} already has this component`);
@@ -92,5 +96,9 @@ export function ComponentStore<T extends Record<string, any>>(): IComponentStore
     return componentSet.getSize();
   }
 
-  return { add, remove, getIndex, getDense, getData, getSize };
+  function getSparse(): number[] {
+    return componentSet.getSparse();
+  }
+
+  return { add, remove, getIndex, getDense, getData, getSize, getSparse };
 }
