@@ -11,7 +11,7 @@ A minimalistic game engine with zero dependencies based on the **Entity Componen
 
 - **SparSet** for ultra-fast entities lookup
 
-- **Structure of Arrays(SoA)** for optimized memory storage and access
+- **Structure of Arrays(SoA)** for optimized memory storage and access — numeric fields are backed by `Float32Array`, non-numeric fields by plain arrays
 
 - **Bitmask** for efficient component queries
 
@@ -19,7 +19,7 @@ A minimalistic game engine with zero dependencies based on the **Entity Componen
 
 - **EntityManager**: Manage creation, destruction and entity recycle. Uses a bitmask to track components of every entity.
 
-- **ComponentStore**: Generic store that maintains components data in SoA format to maximise cache locality.
+- **ComponentStore**: Generic store that maintains component data in SoA format to maximise cache locality — numeric fields in a growable `Float32Array`, non-numeric fields (e.g. `HTMLImageElement`) in a plain array.
 
 - **ECS**: Central Orchestator that coordinates entity and components, expose an API for queries and CRUD operations
 
@@ -42,9 +42,10 @@ const World = ECS<{
   Sprite: { src: HTMLImageElement };
 }>();
 
-// Define the structure of components that will be converted in SoA Arrays with the types previously defined
-// Position = { x: number[], y: number[] }
-// Size = { src: HTMLImageElement[] }
+// Define the structure of components that will be converted to SoA storage.
+// Numeric fields become Float32Array, everything else stays a plain array.
+// Position = { x: Float32Array, y: Float32Array }
+// Sprite   = { src: HTMLImageElement[] }
 // etc.
 World.defineComponents('Position', 'Velocity', 'Size', 'Sprite');
 
@@ -73,6 +74,15 @@ function gameLoop() {
 
 gameLoop();
 ```
+
+## Error Handling
+
+Every operation validates its inputs and throws a descriptive `Error` instead of failing silently or corrupting state:
+
+- `addComponent` / `removeComponent` / `destroyEntity` throw if the entity does not exist
+- `addComponent` throws if the entity already has the component; `removeComponent` throws if it doesn't
+- `query`, `addComponent` and `removeComponent` throw if the component name was never registered via `defineComponents`
+- `defineComponents` throws if a component name is already defined
 
 ## ⚖️ License
 

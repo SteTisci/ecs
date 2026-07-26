@@ -12,6 +12,7 @@ export interface IECS<T> {
    * Registers all components and creates their corresponding stores.
    * Must be called before any other operations.
    * @param names -component names
+   * @throws Error if a component name is already defined
    */
   defineComponents<K extends readonly (keyof T)[]>(...names: K): void;
 
@@ -57,7 +58,7 @@ export interface IECS<T> {
    * @returns A generator that yields an object for each matching entity,
    *          containing the entity ID and the related component data
    */
-  query: <C extends (keyof T)[]>(...componentName: C) => Generator<QueryResult<T, C>>;
+  query: <C extends (keyof T)[]>(...componentName: C) => Generator<QueryResult<C>>;
 
   components: StoreDataMap<T>;
 }

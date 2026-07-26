@@ -13,6 +13,8 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
   // Initialize the structure of the components used
   function defineComponents<K extends readonly (keyof T)[]>(...names: K): void {
     for (const name of names) {
+      if (name in internalStores) throw new Error(`Component ${String(name)} is already defined`);
+
       ComponentRegistry.register(name as string);
       internalStores[name] = ComponentStore<T[typeof name]>();
       components[name] = internalStores[name].getData();
@@ -54,8 +56,15 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
   }
 
   // Generator function to retrive the indexes of the entity components searched
-  function* query<C extends (keyof T)[]>(...componentName: C): Generator<QueryResult<T, C>> {
+  function* query<C extends (keyof T)[]>(...componentName: C): Generator<QueryResult<C>> {
     if (componentName.length === 0) return;
+
+    // Validate that every requested component is registered before touching internalStores,
+    // so an unknown name throws a clear error instead of a raw "undefined" access below.
+    let targetMask = 0n;
+    for (const name of componentName) {
+      targetMask |= 1n << BigInt(ComponentRegistry.getID(name as keyof T & string));
+    }
 
     let smallestStore = internalStores[componentName[0]];
     let smallestSize = smallestStore.getSize();
@@ -70,11 +79,6 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
       }
     }
 
-    let targetMask = 0n;
-    for (const name of componentName) {
-      targetMask |= 1n << BigInt(ComponentRegistry.getID(name as keyof T & string));
-    }
-
     for (const eid of smallestStore.getDense()) {
       if ((Entities.getMask(eid) & targetMask) !== targetMask) continue;
 
@@ -86,7 +90,7 @@ export function ECS<T extends Record<string, Record<string, any>>>(): IECS<T> {
         result[name] = { id };
       }
 
-      yield result as QueryResult<T, C>;
+      yield result as QueryResult<C>;
     }
   }
 

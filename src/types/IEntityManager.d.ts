@@ -59,6 +59,7 @@ export interface IEntityManager<K extends string> {
    * with each bit corresponding to a component ID.
    * @param eid - The entity ID
    * @returns The entity's component bitmask
+   * @throws Error if the entity doesn't exist
    */
   getMask: (eid: number) => bigint;
 }

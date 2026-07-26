@@ -51,6 +51,8 @@ export function EntityManager<K extends string>(registry: IComponentRegistry<K>)
   }
 
   function getMask(eid: number): bigint {
+    if (!exists(eid)) throw new Error(`Entity ${eid} does not exist`);
+
     return bitMasks[eid];
   }
 
