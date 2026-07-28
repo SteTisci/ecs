@@ -5,6 +5,9 @@
  *
  * - sparse: a direct lookup table that maps an entity ID (eid) to its index in the dense array.
  * - dense: a compact array that stores all active entity IDs contiguously.
+ *
+ * Entity IDs that are not in the set map to -1 rather than being deleted, so `sparse`
+ * never degrades into a dictionary-mode array.
  */
 export interface ISparseSet {
   /**
@@ -31,7 +34,7 @@ export interface ISparseSet {
   /**
    * Retrive the index of the entity ID in the set
    * @param eid The entity ID
-   * @returns The index corresponding to an entity ID in the set
+   * @returns The index corresponding to an entity ID in the set, or -1 if it is absent
    */
   getIndex: (eid: number) => number;
 
@@ -50,7 +53,7 @@ export interface ISparseSet {
   /**
    * Retrive the raw sparse lookup table, mapping an entity ID to its dense index.
    * Intended for hot loops that would otherwise call getIndex() once per entity.
-   * Only the entries of entities currently in the set are meaningful.
+   * Entities that are not in the set map to -1.
    * @returns The live sparse array
    */
   getSparse: () => number[];

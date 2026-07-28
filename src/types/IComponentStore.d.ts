@@ -25,9 +25,19 @@ export interface IComponentStore<T> {
   remove: (eid: number) => void;
 
   /**
+   * Pre-allocates room for the given number of components in the numeric arrays.
+   * Storage grows on demand anyway; reserving avoids the repeated copies of doubling and,
+   * because growing replaces the underlying typed array, keeps a cached field reference
+   * valid for as long as the store stays within the reserved size.
+   * @param count - The number of component slots to make room for
+   */
+  reserve: (count: number) => void;
+
+  /**
    * Gets the index of an entity's component data in the dense arrays.
    * @param eid - The entity ID
-   * @returns The index in the data arrays where this entity's component data is stored
+   * @returns The index in the data arrays where this entity's component data is stored,
+   *          or -1 if the entity does not have this component
    */
   getIndex: (eid: number) => number;
 

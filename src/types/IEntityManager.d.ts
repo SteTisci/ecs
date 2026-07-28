@@ -2,6 +2,10 @@
  * Interface for managing entities and their component associations.
  * Uses bitmasks to efficiently track which components each entity has,
  * enabling fast component checks and queries.
+ *
+ * A mask is a multi-word bitset: word `w` holds the components with IDs
+ * [w*32, w*32+32). Words are plain int32 numbers, so no bitwise operation on a mask
+ * allocates.
  */
 export interface IEntityManager<K extends string> {
   /**
@@ -49,25 +53,40 @@ export interface IEntityManager<K extends string> {
    * Updates the entity's bitmask to indicate it no longer has the specified component.
    * @param eid - The entity ID
    * @param name - The component name
-   * @throws Error if the entity doesn't exist
+   * @throws Error if the entity doesn't exist or doesn't have the component
    */
   removeComponent: (eid: number, name: K) => void;
 
   /**
-   * Retrieves the complete bitmask for an entity.
-   * The bitmask represents all components the entity has,
-   * with each bit corresponding to a component ID.
+   * Membership test for hot loops: reports whether the entity is alive *and* carries
+   * every component set in the target mask. Allocates nothing, so it can be called once
+   * per entity scanned.
    * @param eid - The entity ID
-   * @returns The entity's component bitmask
-   * @throws Error if the entity doesn't exist
+   * @param target - The requested components, as a multi-word bitset
+   * @returns True if the entity is alive and holds every requested component
    */
-  getMask: (eid: number) => bigint;
+  matches: (eid: number, target: Int32Array) => boolean;
 
   /**
-   * Non-throwing variant of getMask, for hot loops.
-   * Lets a caller test existence and component membership with a single call.
+   * Reads a single word of an entity's bitmask, for callers that need to walk the
+   * components an entity owns rather than test a fixed set.
    * @param eid - The entity ID
-   * @returns The entity's bitmask, or undefined if the entity does not exist
+   * @param word - The word index, covering component IDs [word*32, word*32+32)
+   * @returns The bits of that word, or 0 if the word was never allocated
    */
-  tryGetMask: (eid: number) => bigint | undefined;
+  getMaskWord: (eid: number, word: number) => number;
+
+  /**
+   * Number of words currently backing the entity masks, i.e. the upper bound for
+   * `getMaskWord`.
+   * @returns The mask width in 32-bit words
+   */
+  getWordCount: () => number;
+
+  /**
+   * Pre-allocates room for the given number of entity IDs.
+   * Storage grows on demand anyway; this only avoids the repeated copies of doubling.
+   * @param count - The number of entity slots to make room for
+   */
+  reserve: (count: number) => void;
 }

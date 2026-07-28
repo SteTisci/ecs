@@ -2,28 +2,31 @@ import type { IComponentRegistry } from '../types/IComponentRegistry.js';
 
 export function createComponentRegistry<K extends string>(): IComponentRegistry<K> {
   const nameToID = new Map<K, number>();
-  const IDtoName = new Map<number, K>();
-  let nextID: number = 0;
+
+  // IDs are handed out sequentially, so the reverse direction is a plain array indexed by
+  // component ID rather than a Map: destroyEntity resolves a name for every component an
+  // entity owns, and an array index is cheaper than a hash lookup.
+  const IDtoName: K[] = [];
 
   function register(name: K): void {
     if (!nameToID.has(name)) {
-      const eid = nextID++;
+      const cid = IDtoName.length;
 
-      nameToID.set(name, eid);
-      IDtoName.set(eid, name);
+      nameToID.set(name, cid);
+      IDtoName.push(name);
     }
   }
 
   function getID(name: K): number {
-    const eid = nameToID.get(name);
-    if (eid === undefined) throw new Error(`Component ${name} not registered`);
+    const cid = nameToID.get(name);
+    if (cid === undefined) throw new Error(`Component ${name} not registered`);
 
-    return eid;
+    return cid;
   }
 
   function getName(cid: number): K {
-    const name = IDtoName.get(cid);
-    if (!name) throw new Error(`Component ID ${cid} not registered`);
+    const name = IDtoName[cid];
+    if (name === undefined) throw new Error(`Component ID ${cid} not registered`);
 
     return name;
   }
